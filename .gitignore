@@ -4,3 +4,5 @@ world
 *.png
 \#*
 .#*
+glide.lock
+glide.yaml

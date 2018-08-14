@@ -116,9 +116,11 @@ func worldImage(t *testing.T) (im *image.RGBA, zoneOfColor map[color.RGBA]string
 		r.Rasterize(raster.NewMonochromePainter(painter))
 	}
 
-	sr, err := shp.Open("world/tz_world.shp")
+	sr, err := shp.Open("dist/combined-shapefile.shp")
 	if err != nil {
-		t.Fatalf("Error opening world/tz_world.shp: %v; unzip it from http://efele.net/maps/tz/world/tz_world.zip", err)
+		t.Fatalf("Error opening dist/combined-shapefile.shp: %v; unzip it from " +
+			"https://github.com/evansiroky/timezone-boundary-builder/releases/download/2018d/timezones.shapefile.zip",
+			err)
 	}
 	defer sr.Close()
 
@@ -151,29 +153,6 @@ func worldImage(t *testing.T) (im *image.RGBA, zoneOfColor map[color.RGBA]string
 		}
 		drawPoly(col, xys...)
 	}
-
-	// adjust point from scale 32 to whatever the user is using.
-	ap := func(x int) int { return x * int(scale) / 32 }
-	// Fix some rendering glitches:
-	// {186 205 234 255} = Europe/Rome
-	drawPoly(color.RGBA{186, 205, 234, 255},
-		ap(6156), ap(1468),
-		ap(6293), ap(1596),
-		ap(6293), ap(1598),
-		ap(6156), ap(1540))
-	// {136 136 180 255} = America/Boise
-	drawPoly(color.RGBA{136, 136, 180, 255},
-		ap(2145), ap(1468),
-		ap(2189), ap(1468),
-		ap(2189), ap(1536),
-		ap(2145), ap(1536))
-	// {120 247 14 255} = America/Denver
-	drawPoly(color.RGBA{120, 247, 14, 255},
-		ap(2167), ap(1536),
-		ap(2171), ap(1536),
-		ap(2217), ap(1714),
-		ap(2204), ap(1724),
-		ap(2160), ap(1537))
 	return
 }
 
