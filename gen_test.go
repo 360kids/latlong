@@ -39,7 +39,7 @@ import (
 	"time"
 
 	"github.com/golang/freetype/raster"
-	shp "github.com/jonas-p/go-shp"
+	"github.com/jonas-p/go-shp"
 	"golang.org/x/image/math/fixed"
 )
 
@@ -134,6 +134,9 @@ func worldImage(t *testing.T) (im *image.RGBA, zoneOfColor map[color.RGBA]string
 		if zoneName == "uninhabited" {
 			continue
 		}
+		//if zoneName != "Europe/Berlin" {
+		//	continue
+		//}
 		if _, err := time.LoadLocation(zoneName); err != nil {
 			t.Fatalf("Failed to load: %v (%v)", zoneName, err)
 		}
@@ -147,11 +150,21 @@ func worldImage(t *testing.T) (im *image.RGBA, zoneOfColor map[color.RGBA]string
 			zoneOfColor[col] = zoneName
 		}
 
-		var xys []int
-		for _, pt := range p.Points {
-			xys = append(xys, int((pt.X+180)*scale), int((90-pt.Y)*scale))
+		pointSeq := 0
+		for partSeq := 1; int32(partSeq) <= p.NumParts; partSeq++ {
+			var xys []int
+			for ; ; pointSeq++ {
+				if int32(pointSeq) >= p.NumPoints {
+					break
+				}
+				if int32(partSeq) != p.NumParts && int32(pointSeq) >= p.Parts[partSeq] {
+					break
+				}
+				xys = append(xys, int((p.Points[pointSeq].X+180)*scale), int((90-p.Points[pointSeq].Y)*scale))
+			}
+			drawPoly(col, xys...)
 		}
-		drawPoly(col, xys...)
+		//saveToPNGFile("test.png", im)
 	}
 	return
 }
@@ -626,3 +639,11 @@ func (w *zoneLookerWriter) Source() []byte {
 	log.Printf("zone lookers packed line = %d bytes", buf.Len())
 	return buf.Bytes()
 }
+
+//func TestWorldImage(t *testing.T) {
+//	*flagScale = 64
+//	fmt.Println(*flagScale)
+//	im, _ := worldImage(t)
+//	fmt.Println(im.Bounds())
+//	fmt.Println(im.Rect)
+//}

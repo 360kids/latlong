@@ -29,6 +29,8 @@ func TestLookupLatLong(t *testing.T) {
 		{39.980125, 116.483461, "Asia/Shanghai"},
 		{33.944655, -103.052396, "America/Denver"},
 		{33.900382, -102.911706, "America/Chicago"},
+		{51.6891362, 7.7865954, "Europe/Berlin"},
+		{59.9182647,10.747593, "Europe/Oslo"},
 	}
 	for _, tt := range cases {
 		if got := LookupZoneName(tt.lat, tt.long); got != tt.want {
